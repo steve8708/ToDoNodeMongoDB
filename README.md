@@ -13,7 +13,6 @@ This is a simple application of a todo list build with NodeJS + Express + Mongoo
 
 1. Organize the routes in separate files
 2. Mark all todo as done functionally
-3. Exclude todos
 
 ===
 ### This application was based on TodoMVC by addyosmani
