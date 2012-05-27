@@ -43,6 +43,7 @@ app.post('/todos/add', function(req,res) {
 
   todo.save(function(err) {
     if( err ) throw err;
+    console.log("Todo Saved.")
     res.send( todo )
   });
 
@@ -59,16 +60,32 @@ app.get('/todos/',function(req,res) {
 });
 
 
-app.post('/todos/marktodo/', function (req, res) {
+app.post('/todos/marktodo', function (req, res) {
   return Todo.findById(req.body.id, function (err, todo) {
     todo.done = req.body.status == 'done' ? true : false;
     return todo.save(function (err) {
       if (!err) {
-        console.log("updated");
+        console.log("Todo Updated.");
       } else {
         console.log(err);
       }
       return res.send(todo);
+    });
+  });
+});
+
+/**
+* Remove one Todo
+*/
+app.post('/todos/destroy', function (req, res) {
+  return Todo.findById(req.body.id, function (err, todo) {
+    return todo.remove(function (err) {
+      if (!err) {
+        console.log("Todo Removed.");
+        return res.send('');
+      } else {
+        console.log(err);
+      }
     });
   });
 });

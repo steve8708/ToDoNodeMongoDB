@@ -6,11 +6,12 @@ jQuery(function($) {
 		init: function() {
 			this.ENTER_KEY = 13;
 			this.POST_URL = '/todos/add';
-			this.MARK_AS_DONE_URL = '/todos/marktodo/';
+			this.MARK_AS_DONE_URL = '/todos/marktodo';
+			this.DESTROY_URL = '/todos/destroy';
 			this.todos = this.store();
 			this.cacheElements();
-			this.bindEvents();
 			this.render();
+			this.bindEvents();
 		},
 		cacheElements: function() {
 			this.$todoApp = $('#todoapp');
@@ -22,6 +23,7 @@ jQuery(function($) {
 			this.$count = $('#todo-count');
 			this.$clearBtn = $('#clear-completed');
 		},
+		// Save the Todo
 		store: function( data ) {
 			if( data ) {
 				$.post( App.POST_URL , data, function(data, textStatus, jqXHR) {
@@ -30,6 +32,7 @@ jQuery(function($) {
 			}
 
 		},
+		// Bind all events
 		bindEvents: function() {
 			var list = this.$todoList;
 			this.$newTodo.on( 'keyup', this.create );
@@ -46,8 +49,11 @@ jQuery(function($) {
 					$(this).attr('checked',false);
 
 
-			})
+			});
+			$('.destroy').live('click',function() { App.destroy( $(this) ); })
+
 		},
+		// Get the todo when user press 'ENTER' key.
 		create: function(e) {
 			if ( e.which !== App.ENTER_KEY ) {
 				return;
@@ -67,9 +73,15 @@ jQuery(function($) {
 
 			$input.val('');
 		},
+		// Include todo in DOM
 		appendTodo: function( todo ) {
 			$('#todo-list').append( App.template(todo) )
 		},
+		// Remove todo from DOM
+		removeTodo: function( todoId ) {
+			$('li#'+todoId).remove();
+		},		
+		// Get all todos from server and render it.
 		render: function() {
 			$.getJSON('/todos/', function(data) {
 			  var tam, i;
@@ -82,6 +94,7 @@ jQuery(function($) {
 
 			});
 		},
+		// Remove or add the class for todo, done or not. and after that, change the todo status
 		changeTodoStatus: function( id, status ) {
 			var list = this.$todoList;
 
@@ -95,6 +108,7 @@ jQuery(function($) {
 
 			App.markTodo( id, status );
 		},
+		// Change the Todo Status to Done or not
 		markTodo: function( todoId, status ) {
 
 			var data = {
@@ -104,6 +118,15 @@ jQuery(function($) {
 
 			$.post( App.MARK_AS_DONE_URL , data);
 		},
+		// Send todo id to server to destroy it
+		destroy: function( e ) {
+			var todo = e.parent().parent().attr('id')
+
+			$.post(App.DESTROY_URL, {id: todo});
+			
+			App.removeTodo( todo )
+		},
+		// Template for each todo
 		template: function( todo ) {
 			var template, status,checked;
 
